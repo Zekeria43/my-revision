@@ -9,128 +9,170 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <style>
   :root{
-    --bg:#f6f8ff; --card:#ffffff; --ink:#0e1730; --muted:#5b6786;
-    --brand1:#1b6af5; --brand2:#7c3aed; --gold1:#fcd34d; --gold2:#f97316;
-    --ring:rgba(27,106,245,.14); --border:rgba(14,23,48,.10);
-  }
-  @media (prefers-color-scheme: dark){
-    :root{ --bg:#080d1c; --card:#101731; --ink:#eef2ff; --muted:#9aa6c7;
-           --ring:rgba(124,180,255,.16); --border:rgba(255,255,255,.10); }
+    --bg:#060a16; --bg2:#0a1024;
+    --ink:#eef2ff; --muted:#93a0c4;
+    --card:rgba(255,255,255,.055); --card2:rgba(255,255,255,.08);
+    --border:rgba(255,255,255,.12);
+    --blue:#4f8bff; --violet:#a855f7; --gold1:#fcd34d; --gold2:#f97316;
+    --grad:linear-gradient(120deg,#4f8bff,#a855f7 55%,#f97316);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
     font-family:"Segoe UI",system-ui,-apple-system,"Noto Sans Arabic",Tahoma,sans-serif;
-    background:
-      radial-gradient(900px 500px at 12% -8%, var(--ring), transparent 60%),
-      radial-gradient(760px 460px at 88% 0%, rgba(124,58,237,.14), transparent 60%),
-      var(--bg);
-    color:var(--ink); line-height:1.6; min-height:100vh;
+    background:var(--bg);color:var(--ink);line-height:1.6;min-height:100vh;
+    overflow-x:hidden;
   }
   a{color:inherit}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-  header{
-    position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
-    background:color-mix(in srgb, var(--bg) 78%, transparent);
-    border-bottom:1px solid var(--border);
+
+  /* ── animated background: glows + rising bubbles ── */
+  .bg{position:fixed;inset:0;z-index:-2;overflow:hidden}
+  .glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5}
+  .g1{width:560px;height:560px;background:#1b6af5;top:-180px;left:-120px;animation:float1 16s ease-in-out infinite}
+  .g2{width:480px;height:480px;background:#7c3aed;top:30%;right:-160px;animation:float2 19s ease-in-out infinite}
+  .g3{width:380px;height:380px;background:#f97316;bottom:-140px;left:30%;opacity:.3;animation:float1 22s ease-in-out infinite reverse}
+  @keyframes float1{50%{transform:translate(60px,50px) scale(1.1)}}
+  @keyframes float2{50%{transform:translate(-70px,60px) scale(1.08)}}
+  .bubbles{position:absolute;inset:0}
+  .bub{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.55),rgba(255,255,255,.06) 60%,transparent 70%);
+       border:1px solid rgba(255,255,255,.18);animation:rise linear infinite}
+  @keyframes rise{
+    0%{transform:translateY(110vh) scale(.6);opacity:0}
+    12%{opacity:.75}
+    100%{transform:translateY(-14vh) scale(1.15);opacity:0}
   }
-  .bar{display:flex;align-items:center;gap:12px;height:64px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none}
-  .brand svg{width:38px;height:38px;border-radius:11px;box-shadow:0 6px 18px rgba(27,106,245,.35)}
+  @media (prefers-reduced-motion: reduce){ .glow,.bub{animation:none} }
+
+  .wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+
+  /* ── header ── */
+  header{position:sticky;top:0;z-index:50;backdrop-filter:blur(18px);
+    background:rgba(6,10,22,.72);border-bottom:1px solid var(--border)}
+  .bar{display:flex;align-items:center;gap:14px;height:68px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;text-decoration:none}
+  .brand svg{width:40px;height:40px;border-radius:12px;box-shadow:0 8px 26px rgba(79,139,255,.45)}
   .brand small{display:block;font-size:11px;font-weight:600;color:var(--muted)}
   .spacer{flex:1}
-  .langs{display:flex;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px}
-  .langs button{
-    border:0;background:transparent;color:var(--muted);font-weight:700;font-size:13px;
-    padding:6px 12px;border-radius:999px;cursor:pointer;transition:.15s;
-  }
-  .langs button.on{background:linear-gradient(135deg,var(--brand1),var(--brand2));color:#fff}
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;
-    padding:11px 20px;border-radius:14px;transition:.18s;border:1px solid transparent;
-  }
-  .btn-primary{background:linear-gradient(135deg,var(--brand1),var(--brand2));color:#fff;
-    box-shadow:0 10px 26px rgba(27,106,245,.35)}
-  .btn-primary:hover{transform:translateY(-2px)}
-  .btn-ghost{background:var(--card);border-color:var(--border);color:var(--ink)}
-  .btn-ghost:hover{border-color:var(--brand1);color:var(--brand1)}
-  .btn-gold{background:linear-gradient(135deg,var(--gold1),var(--gold2));color:#3b1d00;
-    box-shadow:0 10px 26px rgba(249,115,22,.32)}
+  .langs{display:flex;gap:5px;background:var(--card);border:1px solid var(--border);
+    border-radius:999px;padding:5px;backdrop-filter:blur(10px)}
+  .langs button{border:0;background:transparent;color:var(--muted);font-weight:700;font-size:13px;
+    padding:7px 14px;border-radius:999px;cursor:pointer;transition:.18s}
+  .langs button:hover{color:var(--ink)}
+  .langs button.on{background:var(--grad);color:#fff;box-shadow:0 6px 18px rgba(79,139,255,.4)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;
+    padding:12px 22px;border-radius:14px;transition:.18s;border:1px solid transparent;font-size:14.5px}
+  .btn-grad{background:var(--grad);color:#fff;box-shadow:0 12px 30px rgba(124,58,237,.42);background-size:180% 180%}
+  .btn-grad:hover{transform:translateY(-2px);background-position:100% 0}
+  .btn-glass{background:var(--card);border-color:var(--border);color:var(--ink);backdrop-filter:blur(10px)}
+  .btn-glass:hover{transform:translateY(-2px);border-color:var(--blue);color:#bcd4ff}
+  .btn-gold{background:linear-gradient(135deg,var(--gold1),var(--gold2));color:#31160a;
+    box-shadow:0 12px 30px rgba(249,115,22,.35)}
   .btn-gold:hover{transform:translateY(-2px)}
 
-  .hero{padding:64px 0 40px;display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
-  .pill{
-    display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;
-    padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--border);
-    color:var(--brand1);margin-bottom:18px;
-  }
-  .pill i{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.2)}
-  h1{font-size:clamp(30px,4.4vw,50px);line-height:1.15;letter-spacing:-.02em;font-weight:850}
-  h1 .grad{background:linear-gradient(120deg,var(--brand1),var(--brand2) 60%,var(--gold2));
+  /* ── hero ── */
+  .hero{padding:70px 0 46px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;
+    padding:8px 16px;border-radius:999px;background:var(--card);border:1px solid var(--border);
+    color:#9fc0ff;margin-bottom:20px;backdrop-filter:blur(8px)}
+  .pill i{width:8px;height:8px;border-radius:50%;background:#22c55e;
+    box-shadow:0 0 0 4px rgba(34,197,94,.22);animation:pulse 2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+  h1{font-size:clamp(32px,4.8vw,54px);line-height:1.12;letter-spacing:-.02em;font-weight:850}
+  .grad-txt{background:var(--grad);background-size:200% 200%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:shift 7s ease infinite}
+  @keyframes shift{50%{background-position:100% 50%}}
+  .sub{color:var(--muted);font-size:17px;margin:18px 0 28px;max-width:52ch}
+  .cta{display:flex;flex-wrap:wrap;gap:13px}
+  .stats{display:flex;gap:30px;margin-top:34px;flex-wrap:wrap}
+  .stat b{display:block;font-size:26px;font-weight:850;background:var(--grad);
     -webkit-background-clip:text;background-clip:text;color:transparent}
-  .sub{color:var(--muted);font-size:17px;margin:16px 0 26px;max-width:52ch}
-  .cta{display:flex;flex-wrap:wrap;gap:12px}
-  .stats{display:flex;gap:26px;margin-top:30px;flex-wrap:wrap}
-  .stats b{display:block;font-size:24px;font-weight:850;background:linear-gradient(135deg,var(--brand1),var(--brand2));
-    -webkit-background-clip:text;background-clip:text;color:transparent}
-  .stats span{font-size:12.5px;color:var(--muted);font-weight:600}
+  .stat span{font-size:12.5px;color:var(--muted);font-weight:600}
 
-  .showcase{
-    background:var(--card);border:1px solid var(--border);border-radius:26px;padding:26px;
-    box-shadow:0 30px 70px rgba(14,23,48,.16);position:relative;overflow:hidden;
-  }
-  .showcase::before{content:"";position:absolute;inset:0;
-    background:radial-gradient(400px 200px at 80% -10%, rgba(124,58,237,.12), transparent)}
-  .showcase svg.logo{width:104px;height:104px;border-radius:24px;display:block;margin:6px auto 16px;
-    box-shadow:0 18px 44px rgba(27,106,245,.4);position:relative}
+  /* ── showcase (glass) ── */
+  .showcase{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:32px 28px;
+    backdrop-filter:blur(22px);box-shadow:0 40px 90px rgba(0,0,0,.5);position:relative;overflow:hidden}
+  .showcase::after{content:"";position:absolute;inset:0;border-radius:28px;pointer-events:none;
+    background:linear-gradient(140deg,rgba(255,255,255,.14),transparent 42%)}
+  .showcase svg.logo{width:112px;height:112px;border-radius:26px;display:block;margin:4px auto 18px;
+    box-shadow:0 24px 60px rgba(79,139,255,.5);position:relative;animation:bob 5s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-9px)}}
   .showcase h3{text-align:center;font-size:19px;position:relative}
-  .showcase p{text-align:center;color:var(--muted);font-size:13.5px;margin-top:6px;position:relative}
-  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;position:relative}
-  .role{background:color-mix(in srgb,var(--bg) 70%, var(--card));border:1px solid var(--border);
-    border-radius:14px;padding:12px;text-align:center;font-size:12px;font-weight:700}
-  .role span{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:3px}
+  .showcase p{text-align:center;color:var(--muted);font-size:13.5px;margin-top:7px;position:relative}
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:22px;position:relative}
+  .role{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:16px;
+    padding:14px 10px;text-align:center;font-size:12.5px;font-weight:700;transition:.18s}
+  .role:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.3)}
+  .role span{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:4px}
 
-  section{padding:44px 0}
-  h2{font-size:clamp(22px,3vw,32px);font-weight:850;letter-spacing:-.01em}
-  .lead{color:var(--muted);margin-top:8px;max-width:60ch}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:26px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;
-    transition:.18s;position:relative;overflow:hidden}
-  .card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--brand1) 40%, transparent);
-    box-shadow:0 18px 40px rgba(14,23,48,.12)}
-  .ico{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:13px;
-    background:linear-gradient(135deg,rgba(27,106,245,.16),rgba(124,58,237,.16));font-size:21px}
-  .card h4{font-size:15.5px;font-weight:800}
-  .card p{color:var(--muted);font-size:13.5px;margin-top:6px}
+  section{padding:48px 0}
+  .sec-head{text-align:center;max-width:640px;margin:0 auto}
+  h2{font-size:clamp(24px,3.2vw,34px);font-weight:850;letter-spacing:-.01em}
+  .lead{color:var(--muted);margin-top:10px}
 
-  .panel{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:26px;margin-top:24px}
-  .panel h3{font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
-  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:16px}
+  /* ── bento grid ── */
+  .bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:34px}
+  .cell{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:24px;
+    backdrop-filter:blur(14px);transition:.2s;position:relative;overflow:hidden}
+  .cell::before{content:"";position:absolute;top:-40%;right:-30%;width:180px;height:180px;border-radius:50%;
+    background:var(--grad);opacity:0;filter:blur(50px);transition:.3s}
+  .cell:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.28)}
+  .cell:hover::before{opacity:.28}
+  .c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}
+  .ico{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;margin-bottom:15px;
+    font-size:23px;background:linear-gradient(135deg,rgba(79,139,255,.28),rgba(168,85,247,.28));
+    border:1px solid rgba(255,255,255,.16)}
+  .cell h4{font-size:16px;font-weight:800}
+  .cell p{color:var(--muted);font-size:13.5px;margin-top:7px}
+  .cell .big{font-size:15px;line-height:1.75}
+
+  /* ── panels ── */
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:30px;
+    margin-top:26px;backdrop-filter:blur(16px)}
+  .panel h3{font-size:17.5px;font-weight:800;display:flex;align-items:center;gap:10px}
+  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:13px;margin-top:18px}
   .link{display:flex;align-items:center;justify-content:space-between;gap:10px;
-    background:color-mix(in srgb,var(--bg) 70%, var(--card));border:1px solid var(--border);
-    border-radius:14px;padding:13px 16px;text-decoration:none;font-weight:700;font-size:13.5px;transition:.15s}
-  .link:hover{border-color:var(--brand1);color:var(--brand1);transform:translateY(-2px)}
+    background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:16px;
+    padding:15px 18px;text-decoration:none;font-weight:700;font-size:13.5px;transition:.16s}
   .link em{font-style:normal;color:var(--muted);font-weight:600;font-size:11.5px;display:block}
-  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
-  th,td{padding:11px 12px;text-align:start;border-bottom:1px solid var(--border)}
-  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-  td code{background:color-mix(in srgb,var(--bg) 80%, var(--card));border:1px solid var(--border);
-    padding:3px 8px;border-radius:8px;font-size:12.5px;font-family:Consolas,monospace}
-  .tag{display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px}
-  .t-owner{background:linear-gradient(135deg,#fcd34d,#f97316);color:#3b1d00}
-  .t-admin{background:rgba(27,106,245,.16);color:var(--brand1)}
-  .t-student{background:rgba(124,58,237,.16);color:var(--brand2)}
-  .note{margin-top:12px;font-size:12.5px;color:var(--muted)}
+  .link:hover{transform:translateY(-3px);border-color:var(--blue);background:rgba(79,139,255,.12)}
+
+  table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px}
+  th,td{padding:13px 12px;text-align:start;border-bottom:1px solid var(--border)}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+  td code{background:rgba(255,255,255,.07);border:1px solid var(--border);padding:4px 9px;
+    border-radius:9px;font-size:12.5px;font-family:Consolas,monospace}
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px}
+  .t-owner{background:linear-gradient(135deg,#fcd34d,#f97316);color:#31160a}
+  .t-admin{background:rgba(79,139,255,.25);color:#a8c8ff;border:1px solid rgba(79,139,255,.4)}
+  .t-student{background:rgba(168,85,247,.25);color:#d3b5ff;border:1px solid rgba(168,85,247,.4)}
+  .note{margin-top:14px;font-size:12.5px;color:var(--muted)}
   .note b{color:var(--ink)}
-  pre{background:#0b1226;color:#cfe0ff;border-radius:14px;padding:16px;overflow:auto;
-    font-size:12.5px;font-family:Consolas,monospace;margin-top:12px;line-height:1.7}
-  pre .c{color:#7c93c7}
-  footer{border-top:1px solid var(--border);padding:26px 0 40px;margin-top:26px;color:var(--muted);font-size:13px}
-  .foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-  @media(max-width:880px){ .hero{grid-template-columns:1fr;padding-top:36px} .roles{grid-template-columns:1fr} }
+  pre{background:#04070f;color:#cfe0ff;border:1px solid var(--border);border-radius:16px;
+    padding:18px;overflow:auto;font-size:12.5px;font-family:Consolas,monospace;margin-top:14px;line-height:1.75}
+  pre .c{color:#5f7bb5}
+
+  footer{border-top:1px solid var(--border);padding:30px 0 46px;margin-top:30px;
+    color:var(--muted);font-size:13px;background:rgba(0,0,0,.25)}
+  .foot{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+  .foot .dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:linear-gradient(135deg,var(--blue),var(--violet));margin-inline-end:7px}
+
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;padding-top:40px}
+    .bento{grid-template-columns:1fr}
+    .c2,.c3,.c4{grid-column:span 1}
+    .roles{grid-template-columns:1fr}
+    .bar{height:auto;padding:12px 0;flex-wrap:wrap}
+  }
 </style>
 </head>
 <body>
+
+<div class="bg" aria-hidden="true">
+  <div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+  <div class="bubbles" id="bubbles"></div>
+</div>
 
 <!-- ══════════ bubbly logo (same mark as the app) ══════════ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -186,7 +228,7 @@
       <button data-lang="fr">Français</button>
       <button data-lang="en" class="on">English</button>
     </div>
-    <a class="btn btn-primary" href="http://localhost:3001/en/login" data-i="login">Log in</a>
+    <a class="btn btn-grad" href="http://localhost:3001/en/login" data-i="login">Log in</a>
   </div>
 </header>
 
@@ -196,24 +238,24 @@
   <div class="hero">
     <div>
       <span class="pill"><i></i><span data-i="pill">3 languages · RTL & LTR · PWA ready</span></span>
-      <h1><span data-i="h1a">Master your studies with</span> <span class="grad" data-i="h1b">one organized platform</span></h1>
+      <h1><span data-i="h1a">Master your studies with</span> <span class="grad-txt" data-i="h1b">one organized platform</span></h1>
       <p class="sub" data-i="sub">Academic structure, timetable, smart planner, quizzes, notes, notifications and analytics — with real accounts, verified emails and a full admin & owner console.</p>
       <div class="cta">
-        <a class="btn btn-primary" href="http://localhost:3001/en/register" data-i="cta1">Create free account</a>
-        <a class="btn btn-ghost" href="#access" data-i="cta2">Local access & logins</a>
+        <a class="btn btn-grad" href="http://localhost:3001/en/register" data-i="cta1">Create free account</a>
+        <a class="btn btn-glass" href="#access" data-i="cta2">Local access & logins</a>
       </div>
       <div class="stats">
-        <div><b>3</b><span data-i="s1">Languages</span></div>
-        <div><b>739×3</b><span data-i="s2">Translated keys</span></div>
-        <div><b>161</b><span data-i="s3">Automated tests</span></div>
-        <div><b>5</b><span data-i="s4">Roles & consoles</span></div>
+        <div class="stat"><b>3</b><span data-i="s1">Languages</span></div>
+        <div class="stat"><b>739×3</b><span data-i="s2">Translated keys</span></div>
+        <div class="stat"><b>161</b><span data-i="s3">Automated tests</span></div>
+        <div class="stat"><b>5</b><span data-i="s4">Roles & consoles</span></div>
       </div>
     </div>
 
     <div class="showcase">
       <svg class="logo" viewBox="0 0 512 512"><use href="#mark"/></svg>
       <h3 data-i="showH">مراجعتي — Ma Révision — My Revision</h3>
-      <p data-i="showP">Bubbly new identity: gradient tile, floating bubbles, open book and a gold progress ring.</p>
+      <p data-i="showP">Bubbly identity: gradient tile, floating bubbles, open book and a gold progress ring.</p>
       <div class="roles">
         <div class="role">👑 Owner<span data-i="r1">/owner console</span></div>
         <div class="role">🛡️ Admin<span data-i="r2">/admin panel</span></div>
@@ -222,24 +264,34 @@
     </div>
   </div>
 
-  <!-- ══════════ features ══════════ -->
+  <!-- ══════════ features (bento) ══════════ -->
   <section id="features">
-    <h2 data-i="fH">Everything a student needs</h2>
-    <p class="lead" data-i="fL">A complete academic management SaaS — built with Next.js, Prisma and next-intl, tested end-to-end.</p>
-    <div class="grid">
-      <div class="card"><div class="ico">📚</div><h4 data-i="f1t">Academic structure</h4><p data-i="f1p">Levels, fields, subjects, lessons and resources — full CRUD with real database persistence.</p></div>
-      <div class="card"><div class="ico">🗓️</div><h4 data-i="f2t">Timetable & calendar</h4><p data-i="f2p">Weekly schedule, calendar events and conflict detection with neighbouring slots.</p></div>
-      <div class="card"><div class="ico">🧠</div><h4 data-i="f3t">Smart study plan</h4><p data-i="f3p">Generated revision plan with automatic progress tracking and priority handling.</p></div>
-      <div class="card"><div class="ico">✅</div><h4 data-i="f4t">Quizzes & notes</h4><p data-i="f4p">Question banks, scoring, notes and a printable report (PDF/CSV export).</p></div>
-      <div class="card"><div class="ico">📈</div><h4 data-i="f5t">Analytics</h4><p data-i="f5p">Real charts of sessions, progress and results — computed server-side per student.</p></div>
-      <div class="card"><div class="ico">🔐</div><h4 data-i="f6t">Real security</h4><p data-i="f6p">DB sessions, mandatory email verification, password recovery, atomic 3/24h email quota.</p></div>
+    <div class="sec-head">
+      <h2 data-i="fH">Everything a student needs</h2>
+      <p class="lead" data-i="fL">A complete academic management SaaS — built with Next.js, Prisma and next-intl, tested end-to-end.</p>
+    </div>
+    <div class="bento">
+      <div class="cell c4"><div class="ico">📚</div><h4 data-i="f1t">Academic structure</h4>
+        <p class="big" data-i="f1p">Levels, fields, subjects, lessons and resources — full CRUD with real database persistence.</p></div>
+      <div class="cell c2"><div class="ico">🗓️</div><h4 data-i="f2t">Timetable & calendar</h4>
+        <p data-i="f2p">Weekly schedule, calendar events and conflict detection with neighbouring slots.</p></div>
+      <div class="cell c2"><div class="ico">🧠</div><h4 data-i="f3t">Smart study plan</h4>
+        <p data-i="f3p">Generated revision plan with automatic progress tracking and priority handling.</p></div>
+      <div class="cell c2"><div class="ico">✅</div><h4 data-i="f4t">Quizzes & notes</h4>
+        <p data-i="f4p">Question banks, scoring, notes and a printable report (PDF/CSV export).</p></div>
+      <div class="cell c2"><div class="ico">📈</div><h4 data-i="f5t">Analytics</h4>
+        <p data-i="f5p">Real charts of sessions, progress and results — computed server-side per student.</p></div>
+      <div class="cell c6 c4" style="grid-column:span 4"><div class="ico">🔐</div><h4 data-i="f6t">Real security</h4>
+        <p class="big" data-i="f6p">DB sessions, mandatory email verification, password recovery, atomic 3/24h email quota.</p></div>
     </div>
   </section>
 
   <!-- ══════════ access ══════════ -->
   <section id="access">
-    <h2 data-i="aH">Local access — final links</h2>
-    <p class="lead" data-i="aL">The full application runs locally (it needs a server + database). Start it, then open:</p>
+    <div class="sec-head">
+      <h2 data-i="aH">Local access — final links</h2>
+      <p class="lead" data-i="aL">The full application runs locally (it needs a server + database). Start it, then open:</p>
+    </div>
 
     <div class="panel">
       <h3>🔗 <span data-i="aLinkH">Application links (localhost:3001)</span></h3>
@@ -254,7 +306,7 @@
         <a class="link" href="http://localhost:3001/en/verify-pending"><span>⏳ Verify pending<em>/verify-pending</em></span>↗</a>
       </div>
 
-      <h3 style="margin-top:28px">🔑 <span data-i="aCredH">Seed credentials (local development)</span></h3>
+      <h3 style="margin-top:30px">🔑 <span data-i="aCredH">Seed credentials (local development)</span></h3>
       <table>
         <thead><tr><th data-i="thRole">Role</th><th data-i="thEmail">Email</th><th data-i="thPass">Password</th><th data-i="thDest">After login</th></tr></thead>
         <tbody>
@@ -265,7 +317,7 @@
       </table>
       <p class="note" data-i="aNote"><b>Change these passwords before any production use.</b> The OWNER role is provisioned only by the database seed — no admin or user action can create or modify it.</p>
 
-      <h3 style="margin-top:28px">🚀 <span data-i="aRunH">Run the full app</span></h3>
+      <h3 style="margin-top:30px">🚀 <span data-i="aRunH">Run the full app</span></h3>
 <pre><span class="c"># from the project folder (marevision/)</span>
 npm install
 npx prisma migrate dev
@@ -280,12 +332,28 @@ npm run build &amp;&amp; npm start   <span class="c"># production → :3001</spa
 
 <footer>
   <div class="wrap foot">
-    <span data-i="foot">© 2026 My Revision — مراجعتي — Ma Révision. All rights reserved.</span>
+    <span><span class="dot"></span><span data-i="foot">© 2026 My Revision — مراجعتي — Ma Révision. All rights reserved.</span></span>
     <span data-i="foot2">Built with Next.js · Prisma · next-intl · 161 tests passing</span>
   </div>
 </footer>
 
 <script>
+/* rising bubbles */
+(function(){
+  const box = document.getElementById('bubbles');
+  const N = 16;
+  for(let i=0;i<N;i++){
+    const b = document.createElement('span');
+    b.className='bub';
+    const s = 8 + Math.random()*46;
+    b.style.width = s+'px'; b.style.height = s+'px';
+    b.style.left = (Math.random()*100)+'%';
+    b.style.animationDuration = (11 + Math.random()*16)+'s';
+    b.style.animationDelay = (-Math.random()*22)+'s';
+    box.appendChild(b);
+  }
+})();
+
 const I18N = {
   en:{ dir:"ltr",
     brand:"My Revision", brandSub:"Ma Révision — مراجعتي", login:"Log in",
@@ -295,7 +363,7 @@ const I18N = {
     cta1:"Create free account", cta2:"Local access & logins",
     s1:"Languages", s2:"Translated keys", s3:"Automated tests", s4:"Roles & consoles",
     showH:"مراجعتي — Ma Révision — My Revision",
-    showP:"Bubbly new identity: gradient tile, floating bubbles, open book and a gold progress ring.",
+    showP:"Bubbly identity: gradient tile, floating bubbles, open book and a gold progress ring.",
     r1:"/owner console", r2:"/admin panel", r3:"/dashboard",
     fH:"Everything a student needs", fL:"A complete academic management SaaS — built with Next.js, Prisma and next-intl, tested end-to-end.",
     f1t:"Academic structure", f1p:"Levels, fields, subjects, lessons and resources — full CRUD with real database persistence.",
@@ -321,7 +389,7 @@ const I18N = {
     cta1:"Créer un compte gratuit", cta2:"Accès local & identifiants",
     s1:"Langues", s2:"Clés traduites", s3:"Tests automatisés", s4:"Rôles & consoles",
     showH:"مراجعتي — Ma Révision — My Revision",
-    showP:"Nouvelle identité « bubbly » : tuile dégradée, bulles flottantes, livre ouvert et anneau de progression doré.",
+    showP:"Identité « bubbly » : tuile dégradée, bulles flottantes, livre ouvert et anneau de progression doré.",
     r1:"console /owner", r2:"panneau /admin", r3:"/dashboard",
     fH:"Tout ce dont un étudiant a besoin", fL:"Un SaaS complet de gestion académique — construit avec Next.js, Prisma et next-intl, testé de bout en bout.",
     f1t:"Structure académique", f1p:"Niveaux, filières, matières, leçons et ressources — CRUD complet avec persistance réelle en base.",
@@ -347,7 +415,7 @@ const I18N = {
     cta1:"أنشئ حساباً مجانياً", cta2:"الوصول المحلي وبيانات الدخول",
     s1:"لغات", s2:"مفتاح مترجَم", s3:"اختبار آلي", s4:"أدوار وَلوحات",
     showH:"مراجعتي — Ma Révision — My Revision",
-    showP:"هوية فقاعية جديدة: تدرّج أزرق→بنفسجي، فقاعات عائمة، كتاب مفتوح وحلقة تقدّم ذهبية.",
+    showP:"هوية فقاعية: تدرّج أزرق→بنفسجي، فقاعات عائمة، كتاب مفتوح وحلقة تقدّم ذهبية.",
     r1:"لوحة المالك /owner", r2:"لوحة الإدارة /admin", r3:"/dashboard",
     fH:"كل ما يحتاجه الطالب", fL:"منصة إدارة أكاديمية متكاملة — بُنيت بـ Next.js وPrisma وnext-intl ومُختبَرة من أولها لآخرها.",
     f1t:"البنية الأكاديمية", f1p:"المستويات والحقول والمواد والدروس والموارد — عمليات كاملة بحفظ حقيقي في قاعدة البيانات.",
