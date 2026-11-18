@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My Revision — مراجعتي — Ma Révision</title>
+<meta name="description" content="Trilingual academic management platform: structure, timetable, smart planner, quizzes, notes, analytics. / منصة أكاديمية متعددة اللغات لإدارة الدراسة." />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<style>
+  :root{
+    --bg:#f6f8ff; --card:#ffffff; --ink:#0e1730; --muted:#5b6786;
+    --brand1:#1b6af5; --brand2:#7c3aed; --gold1:#fcd34d; --gold2:#f97316;
+    --ring:rgba(27,106,245,.14); --border:rgba(14,23,48,.10);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#080d1c; --card:#101731; --ink:#eef2ff; --muted:#9aa6c7;
+           --ring:rgba(124,180,255,.16); --border:rgba(255,255,255,.10); }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Noto Sans Arabic",Tahoma,sans-serif;
+    background:
+      radial-gradient(900px 500px at 12% -8%, var(--ring), transparent 60%),
+      radial-gradient(760px 460px at 88% 0%, rgba(124,58,237,.14), transparent 60%),
+      var(--bg);
+    color:var(--ink); line-height:1.6; min-height:100vh;
+  }
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  header{
+    position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:color-mix(in srgb, var(--bg) 78%, transparent);
+    border-bottom:1px solid var(--border);
+  }
+  .bar{display:flex;align-items:center;gap:12px;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none}
+  .brand svg{width:38px;height:38px;border-radius:11px;box-shadow:0 6px 18px rgba(27,106,245,.35)}
+  .brand small{display:block;font-size:11px;font-weight:600;color:var(--muted)}
+  .spacer{flex:1}
+  .langs{display:flex;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px}
+  .langs button{
+    border:0;background:transparent;color:var(--muted);font-weight:700;font-size:13px;
+    padding:6px 12px;border-radius:999px;cursor:pointer;transition:.15s;
+  }
+  .langs button.on{background:linear-gradient(135deg,var(--brand1),var(--brand2));color:#fff}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;
+    padding:11px 20px;border-radius:14px;transition:.18s;border:1px solid transparent;
+  }
+  .btn-primary{background:linear-gradient(135deg,var(--brand1),var(--brand2));color:#fff;
+    box-shadow:0 10px 26px rgba(27,106,245,.35)}
+  .btn-primary:hover{transform:translateY(-2px)}
+  .btn-ghost{background:var(--card);border-color:var(--border);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--brand1);color:var(--brand1)}
+  .btn-gold{background:linear-gradient(135deg,var(--gold1),var(--gold2));color:#3b1d00;
+    box-shadow:0 10px 26px rgba(249,115,22,.32)}
+  .btn-gold:hover{transform:translateY(-2px)}
+
+  .hero{padding:64px 0 40px;display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;
+    padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--border);
+    color:var(--brand1);margin-bottom:18px;
+  }
+  .pill i{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.2)}
+  h1{font-size:clamp(30px,4.4vw,50px);line-height:1.15;letter-spacing:-.02em;font-weight:850}
+  h1 .grad{background:linear-gradient(120deg,var(--brand1),var(--brand2) 60%,var(--gold2));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);font-size:17px;margin:16px 0 26px;max-width:52ch}
+  .cta{display:flex;flex-wrap:wrap;gap:12px}
+  .stats{display:flex;gap:26px;margin-top:30px;flex-wrap:wrap}
+  .stats b{display:block;font-size:24px;font-weight:850;background:linear-gradient(135deg,var(--brand1),var(--brand2));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .stats span{font-size:12.5px;color:var(--muted);font-weight:600}
+
+  .showcase{
+    background:var(--card);border:1px solid var(--border);border-radius:26px;padding:26px;
+    box-shadow:0 30px 70px rgba(14,23,48,.16);position:relative;overflow:hidden;
+  }
+  .showcase::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(400px 200px at 80% -10%, rgba(124,58,237,.12), transparent)}
+  .showcase svg.logo{width:104px;height:104px;border-radius:24px;display:block;margin:6px auto 16px;
+    box-shadow:0 18px 44px rgba(27,106,245,.4);position:relative}
+  .showcase h3{text-align:center;font-size:19px;position:relative}
+  .showcase p{text-align:center;color:var(--muted);font-size:13.5px;margin-top:6px;position:relative}
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;position:relative}
+  .role{background:color-mix(in srgb,var(--bg) 70%, var(--card));border:1px solid var(--border);
+    border-radius:14px;padding:12px;text-align:center;font-size:12px;font-weight:700}
+  .role span{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:3px}
+
+  section{padding:44px 0}
+  h2{font-size:clamp(22px,3vw,32px);font-weight:850;letter-spacing:-.01em}
+  .lead{color:var(--muted);margin-top:8px;max-width:60ch}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:26px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;
+    transition:.18s;position:relative;overflow:hidden}
+  .card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--brand1) 40%, transparent);
+    box-shadow:0 18px 40px rgba(14,23,48,.12)}
+  .ico{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:13px;
+    background:linear-gradient(135deg,rgba(27,106,245,.16),rgba(124,58,237,.16));font-size:21px}
+  .card h4{font-size:15.5px;font-weight:800}
+  .card p{color:var(--muted);font-size:13.5px;margin-top:6px}
+
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:26px;margin-top:24px}
+  .panel h3{font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
+  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:16px}
+  .link{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:color-mix(in srgb,var(--bg) 70%, var(--card));border:1px solid var(--border);
+    border-radius:14px;padding:13px 16px;text-decoration:none;font-weight:700;font-size:13.5px;transition:.15s}
+  .link:hover{border-color:var(--brand1);color:var(--brand1);transform:translateY(-2px)}
+  .link em{font-style:normal;color:var(--muted);font-weight:600;font-size:11.5px;display:block}
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+  th,td{padding:11px 12px;text-align:start;border-bottom:1px solid var(--border)}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  td code{background:color-mix(in srgb,var(--bg) 80%, var(--card));border:1px solid var(--border);
+    padding:3px 8px;border-radius:8px;font-size:12.5px;font-family:Consolas,monospace}
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px}
+  .t-owner{background:linear-gradient(135deg,#fcd34d,#f97316);color:#3b1d00}
+  .t-admin{background:rgba(27,106,245,.16);color:var(--brand1)}
+  .t-student{background:rgba(124,58,237,.16);color:var(--brand2)}
+  .note{margin-top:12px;font-size:12.5px;color:var(--muted)}
+  .note b{color:var(--ink)}
+  pre{background:#0b1226;color:#cfe0ff;border-radius:14px;padding:16px;overflow:auto;
+    font-size:12.5px;font-family:Consolas,monospace;margin-top:12px;line-height:1.7}
+  pre .c{color:#7c93c7}
+  footer{border-top:1px solid var(--border);padding:26px 0 40px;margin-top:26px;color:var(--muted);font-size:13px}
+  .foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  @media(max-width:880px){ .hero{grid-template-columns:1fr;padding-top:36px} .roles{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<!-- ══════════ bubbly logo (same mark as the app) ══════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f8bff"/><stop offset=".5" stop-color="#1b6af5"/><stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="lg-ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="lg-page" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dbe7ff"/>
+    </linearGradient>
+    <radialGradient id="lg-gloss" cx=".3" cy=".18" r=".9">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".35"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity=".06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <g id="mark">
+      <rect width="512" height="512" rx="120" fill="url(#lg-bg)"/>
+      <rect width="512" height="512" rx="120" fill="url(#lg-gloss)"/>
+      <circle cx="86" cy="132" r="20" fill="#fff" opacity=".3"/>
+      <circle cx="130" cy="452" r="13" fill="#fff" opacity=".35"/>
+      <circle cx="430" cy="418" r="24" fill="#fff" opacity=".22"/>
+      <circle cx="418" cy="120" r="11" fill="#fcd34d" opacity=".95"/>
+      <path d="M104 330c42-28 100-32 148-12v96c-48-20-106-16-148 12z" fill="url(#lg-page)"/>
+      <path d="M408 330c-42-28-100-32-148-12v96c48-20 106-16 148 12z" fill="url(#lg-page)" opacity=".85"/>
+      <path d="M256 318v108" stroke="#1e40af" stroke-width="12" stroke-linecap="round" opacity=".9"/>
+      <g stroke="#93b4f7" stroke-width="10" stroke-linecap="round" fill="none">
+        <path d="M136 356c30-16 66-18 96-8"/><path d="M136 392c30-16 66-18 96-8"/>
+        <path d="M376 356c-30-16-66-18-96-8"/><path d="M376 392c-30-16-66-18-96-8"/>
+      </g>
+      <circle cx="256" cy="188" r="92" fill="#0b3fa8" opacity=".28"/>
+      <circle cx="256" cy="188" r="78" fill="none" stroke="#ffffff" stroke-opacity=".38" stroke-width="22"/>
+      <circle cx="256" cy="188" r="78" fill="none" stroke="url(#lg-ring)" stroke-width="22"
+              stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="147"
+              transform="rotate(-90 256 188)"/>
+      <path d="M224 190l22 22 42-46" fill="none" stroke="#fff" stroke-width="20"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+</svg>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 512 512"><use href="#mark"/></svg>
+      <span><span data-i="brand">My Revision</span><small data-i="brandSub">Ma Révision — مراجعتي</small></span>
+    </a>
+    <div class="spacer"></div>
+    <div class="langs" role="group" aria-label="Language">
+      <button data-lang="ar">العربية</button>
+      <button data-lang="fr">Français</button>
+      <button data-lang="en" class="on">English</button>
+    </div>
+    <a class="btn btn-primary" href="http://localhost:3001/en/login" data-i="login">Log in</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ══════════ hero ══════════ -->
+  <div class="hero">
+    <div>
+      <span class="pill"><i></i><span data-i="pill">3 languages · RTL & LTR · PWA ready</span></span>
+      <h1><span data-i="h1a">Master your studies with</span> <span class="grad" data-i="h1b">one organized platform</span></h1>
+      <p class="sub" data-i="sub">Academic structure, timetable, smart planner, quizzes, notes, notifications and analytics — with real accounts, verified emails and a full admin & owner console.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="http://localhost:3001/en/register" data-i="cta1">Create free account</a>
+        <a class="btn btn-ghost" href="#access" data-i="cta2">Local access & logins</a>
+      </div>
+      <div class="stats">
+        <div><b>3</b><span data-i="s1">Languages</span></div>
+        <div><b>739×3</b><span data-i="s2">Translated keys</span></div>
+        <div><b>161</b><span data-i="s3">Automated tests</span></div>
+        <div><b>5</b><span data-i="s4">Roles & consoles</span></div>
+      </div>
+    </div>
+
+    <div class="showcase">
+      <svg class="logo" viewBox="0 0 512 512"><use href="#mark"/></svg>
+      <h3 data-i="showH">مراجعتي — Ma Révision — My Revision</h3>
+      <p data-i="showP">Bubbly new identity: gradient tile, floating bubbles, open book and a gold progress ring.</p>
+      <div class="roles">
+        <div class="role">👑 Owner<span data-i="r1">/owner console</span></div>
+        <div class="role">🛡️ Admin<span data-i="r2">/admin panel</span></div>
+        <div class="role">🎓 Student<span data-i="r3">/dashboard</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ features ══════════ -->
+  <section id="features">
+    <h2 data-i="fH">Everything a student needs</h2>
+    <p class="lead" data-i="fL">A complete academic management SaaS — built with Next.js, Prisma and next-intl, tested end-to-end.</p>
+    <div class="grid">
+      <div class="card"><div class="ico">📚</div><h4 data-i="f1t">Academic structure</h4><p data-i="f1p">Levels, fields, subjects, lessons and resources — full CRUD with real database persistence.</p></div>
+      <div class="card"><div class="ico">🗓️</div><h4 data-i="f2t">Timetable & calendar</h4><p data-i="f2p">Weekly schedule, calendar events and conflict detection with neighbouring slots.</p></div>
+      <div class="card"><div class="ico">🧠</div><h4 data-i="f3t">Smart study plan</h4><p data-i="f3p">Generated revision plan with automatic progress tracking and priority handling.</p></div>
+      <div class="card"><div class="ico">✅</div><h4 data-i="f4t">Quizzes & notes</h4><p data-i="f4p">Question banks, scoring, notes and a printable report (PDF/CSV export).</p></div>
+      <div class="card"><div class="ico">📈</div><h4 data-i="f5t">Analytics</h4><p data-i="f5p">Real charts of sessions, progress and results — computed server-side per student.</p></div>
+      <div class="card"><div class="ico">🔐</div><h4 data-i="f6t">Real security</h4><p data-i="f6p">DB sessions, mandatory email verification, password recovery, atomic 3/24h email quota.</p></div>
+    </div>
+  </section>
+
+  <!-- ══════════ access ══════════ -->
+  <section id="access">
+    <h2 data-i="aH">Local access — final links</h2>
+    <p class="lead" data-i="aL">The full application runs locally (it needs a server + database). Start it, then open:</p>
+
+    <div class="panel">
+      <h3>🔗 <span data-i="aLinkH">Application links (localhost:3001)</span></h3>
+      <div class="links">
+        <a class="link" href="http://localhost:3001/ar"><span>العربية (RTL)<em>الصفحة الرئيسية</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/fr"><span>Français (LTR)<em>Page d'accueil</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/en"><span>English (LTR)<em>Landing page</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/en/login"><span>Log in<em>/login · /register</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/en/owner"><span>👑 Owner console<em>/owner</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/en/admin"><span>🛡️ Admin panel<em>/admin</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/en/dashboard"><span>🎓 Student dashboard<em>/dashboard</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/en/verify-pending"><span>⏳ Verify pending<em>/verify-pending</em></span>↗</a>
+      </div>
+
+      <h3 style="margin-top:28px">🔑 <span data-i="aCredH">Seed credentials (local development)</span></h3>
+      <table>
+        <thead><tr><th data-i="thRole">Role</th><th data-i="thEmail">Email</th><th data-i="thPass">Password</th><th data-i="thDest">After login</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag t-owner">👑 OWNER</span></td><td><code>owner@marevision.app</code></td><td><code>Owner12345</code></td><td><code>/owner</code></td></tr>
+          <tr><td><span class="tag t-admin">🛡️ ADMIN</span></td><td><code>admin@marevision.app</code></td><td><code>Admin12345</code></td><td><code>/admin</code></td></tr>
+          <tr><td><span class="tag t-student">🎓 STUDENT</span></td><td><code>student@marevision.app</code></td><td><code>Student12345</code></td><td><code>/dashboard</code></td></tr>
+        </tbody>
+      </table>
+      <p class="note" data-i="aNote"><b>Change these passwords before any production use.</b> The OWNER role is provisioned only by the database seed — no admin or user action can create or modify it.</p>
+
+      <h3 style="margin-top:28px">🚀 <span data-i="aRunH">Run the full app</span></h3>
+<pre><span class="c"># from the project folder (marevision/)</span>
+npm install
+npx prisma migrate dev
+npm run db:seed
+npm run dev            <span class="c"># → http://localhost:3000</span>
+npm run build &amp;&amp; npm start   <span class="c"># production → :3001</span></pre>
+      <p class="note" data-i="aDeploy"><b>Public hosting:</b> the full app is a Next.js server (auth + database) — deploy it to <b>Vercel</b> or any Node host. This Surge page is a static landing only.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span data-i="foot">© 2026 My Revision — مراجعتي — Ma Révision. All rights reserved.</span>
+    <span data-i="foot2">Built with Next.js · Prisma · next-intl · 161 tests passing</span>
+  </div>
+</footer>
+
+<script>
+const I18N = {
+  en:{ dir:"ltr",
+    brand:"My Revision", brandSub:"Ma Révision — مراجعتي", login:"Log in",
+    pill:"3 languages · RTL & LTR · PWA ready",
+    h1a:"Master your studies with", h1b:"one organized platform",
+    sub:"Academic structure, timetable, smart planner, quizzes, notes, notifications and analytics — with real accounts, verified emails and a full admin & owner console.",
+    cta1:"Create free account", cta2:"Local access & logins",
+    s1:"Languages", s2:"Translated keys", s3:"Automated tests", s4:"Roles & consoles",
+    showH:"مراجعتي — Ma Révision — My Revision",
+    showP:"Bubbly new identity: gradient tile, floating bubbles, open book and a gold progress ring.",
+    r1:"/owner console", r2:"/admin panel", r3:"/dashboard",
+    fH:"Everything a student needs", fL:"A complete academic management SaaS — built with Next.js, Prisma and next-intl, tested end-to-end.",
+    f1t:"Academic structure", f1p:"Levels, fields, subjects, lessons and resources — full CRUD with real database persistence.",
+    f2t:"Timetable & calendar", f2p:"Weekly schedule, calendar events and conflict detection with neighbouring slots.",
+    f3t:"Smart study plan", f3p:"Generated revision plan with automatic progress tracking and priority handling.",
+    f4t:"Quizzes & notes", f4p:"Question banks, scoring, notes and a printable report (PDF/CSV export).",
+    f5t:"Analytics", f5p:"Real charts of sessions, progress and results — computed server-side per student.",
+    f6t:"Real security", f6p:"DB sessions, mandatory email verification, password recovery, atomic 3/24h email quota.",
+    aH:"Local access — final links", aL:"The full application runs locally (it needs a server + database). Start it, then open:",
+    aLinkH:"Application links (localhost:3001)", aCredH:"Seed credentials (local development)",
+    thRole:"Role", thEmail:"Email", thPass:"Password", thDest:"After login",
+    aNote:"<b>Change these passwords before any production use.</b> The OWNER role is provisioned only by the database seed — no admin or user action can create or modify it.",
+    aRunH:"Run the full app",
+    aDeploy:"<b>Public hosting:</b> the full app is a Next.js server (auth + database) — deploy it to <b>Vercel</b> or any Node host. This Surge page is a static landing only.",
+    foot:"© 2026 My Revision — مراجعتي — Ma Révision. All rights reserved.",
+    foot2:"Built with Next.js · Prisma · next-intl · 161 tests passing" },
+
+  fr:{ dir:"ltr",
+    brand:"Ma Révision", brandSub:"My Revision — مراجعتي", login:"Connexion",
+    pill:"3 langues · RTL & LTR · PWA prête",
+    h1a:"Maîtrisez vos études avec", h1b:"une plateforme bien organisée",
+    sub:"Structure académique, emploi du temps, planificateur intelligent, quiz, notes, notifications et analyses — avec de vrais comptes, e-mails vérifiés et une console admin + propriétaire.",
+    cta1:"Créer un compte gratuit", cta2:"Accès local & identifiants",
+    s1:"Langues", s2:"Clés traduites", s3:"Tests automatisés", s4:"Rôles & consoles",
+    showH:"مراجعتي — Ma Révision — My Revision",
+    showP:"Nouvelle identité « bubbly » : tuile dégradée, bulles flottantes, livre ouvert et anneau de progression doré.",
+    r1:"console /owner", r2:"panneau /admin", r3:"/dashboard",
+    fH:"Tout ce dont un étudiant a besoin", fL:"Un SaaS complet de gestion académique — construit avec Next.js, Prisma et next-intl, testé de bout en bout.",
+    f1t:"Structure académique", f1p:"Niveaux, filières, matières, leçons et ressources — CRUD complet avec persistance réelle en base.",
+    f2t:"Emploi du temps & calendrier", f2p:"Planning hebdomadaire, événements et détection des conflits avec les créneaux voisins.",
+    f3t:"Plan de révision intelligent", f3p:"Plan de révision généré avec suivi automatique du progress et priorités.",
+    f4t:"Quiz & notes", f4p:"Banques de questions, notation, notes et rapport imprimable (export PDF/CSV).",
+    f5t:"Analyses", f5p:"Graphiques réels des séances, du progress et des résultats — calculés côté serveur par étudiant.",
+    f6t:"Sécurité réelle", f6p:"Sessions en base, vérification e-mail obligatoire, récupération de mot de passe, quota atomique 3/24 h.",
+    aH:"Accès local — liens finaux", aL:"L'application complète tourne localement (elle nécessite un serveur + une base). Démarrez-la, puis ouvrez :",
+    aLinkH:"Liens de l'application (localhost:3001)", aCredH:"Identifiants de seed (développement local)",
+    thRole:"Rôle", thEmail:"E-mail", thPass:"Mot de passe", thDest:"Après connexion",
+    aNote:"<b>Changez ces mots de passe avant toute utilisation en production.</b> Le rôle OWNER n'est provisionné que par le seed de la base — aucune action admin ou utilisateur ne peut le créer ou le modifier.",
+    aRunH:"Lancer l'application complète",
+    aDeploy:"<b>Hébergement public :</b> l'application complète est un serveur Next.js (auth + base) — déployez-la sur <b>Vercel</b> ou tout hôte Node. Cette page Surge est une landing statique.",
+    foot:"© 2026 Ma Révision — مراجعتي — My Revision. Tous droits réservés.",
+    foot2:"Construit avec Next.js · Prisma · next-intl · 161 tests validés" },
+
+  ar:{ dir:"rtl",
+    brand:"مراجعتي", brandSub:"My Revision — Ma Révision", login:"تسجيل الدخول",
+    pill:"٣ لغات · RTL و LTR · جاهز كتطبيق PWA",
+    h1a:"أتقن دراستك مع", h1b:"منصة واحدة منظّمة",
+    sub:"البنية الأكاديمية، الجدول الزمني، المخطط الذكي، الاختبارات، الملاحظات، الإشعارات والتحليلات — بحسابات حقيقية، بريد مُفعّل، ولوحة إدارة ومالك كاملة.",
+    cta1:"أنشئ حساباً مجانياً", cta2:"الوصول المحلي وبيانات الدخول",
+    s1:"لغات", s2:"مفتاح مترجَم", s3:"اختبار آلي", s4:"أدوار وَلوحات",
+    showH:"مراجعتي — Ma Révision — My Revision",
+    showP:"هوية فقاعية جديدة: تدرّج أزرق→بنفسجي، فقاعات عائمة، كتاب مفتوح وحلقة تقدّم ذهبية.",
+    r1:"لوحة المالك /owner", r2:"لوحة الإدارة /admin", r3:"/dashboard",
+    fH:"كل ما يحتاجه الطالب", fL:"منصة إدارة أكاديمية متكاملة — بُنيت بـ Next.js وPrisma وnext-intl ومُختبَرة من أولها لآخرها.",
+    f1t:"البنية الأكاديمية", f1p:"المستويات والحقول والمواد والدروس والموارد — عمليات كاملة بحفظ حقيقي في قاعدة البيانات.",
+    f2t:"الجدول والتقويم", f2p:"جدول أسبوعي، أحداث تقويم وكشف تعارض مع الأوقات المجاورة.",
+    f3t:"المخطط الذكي", f3p:"خطة مراجعة مُولّدة مع تتبّع تلقائي للتقدّم وترتيب بالأولوية.",
+    f4t:"الاختبارات والملاحظات", f4p:"بنوك أسئلة، تصحيح، ملاحظات وتقرير قابل للطباعة (PDF/CSV).",
+    f5t:"التحليلات", f5p:"رسوم بيانية حقيقية للجلسات والتقدّم والنتائج — تُحسب من الخادم لكل طالب.",
+    f6t:"أمان حقيقي", f6p:"جلسات في قاعدة البيانات، تفعيل بريد إجباري، استعادة كلمة مرور، وحصة بريد ذرّية 3/24س.",
+    aH:"الوصول المحلي — الروابط النهائية", aL:"التطبيق الكامل يعمل محلياً (يحتاج خادماً وقاعدة بيانات). شغّله ثم افتح:",
+    aLinkH:"روابط التطبيق (localhost:3001)", aCredH:"حسابات البذور (تطوير محلي)",
+    thRole:"الدور", thEmail:"البريد", thPass:"كلمة المرور", thDest:"بعد الدخول",
+    aNote:"<b>غيّر كلمات المرور هذه قبل أي استخدام إنتاجي.</b> دور المالك (OWNER) يُمنح فقط عبر بذور قاعدة البيانات — لا يوجد إجراء إداري أو عميلي ينشئه أو يُغيّره.",
+    aRunH:"تشغيل التطبيق الكامل",
+    aDeploy:"<b>النشر العام:</b> التطبيق الكامل خادم Next.js (مصادقة + قاعدة بيانات) — انشره على <b>Vercel</b> أو أي مضيف Node. صفحة Surge هذه ثابتة فقط.",
+    foot:"© 2026 مراجعتي — Ma Révision — My Revision. جميع الحقوق محفوظة.",
+    foot2:"بُني بـ Next.js · Prisma · next-intl · 161 اختباراً ناجحاً" },
+};
+
+function apply(lang){
+  const d = I18N[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = d.dir;
+  document.querySelectorAll("[data-i]").forEach(el=>{
+    const v = d[el.dataset.i];
+    if(v===undefined) return;
+    if(v.includes("<b>")) el.innerHTML = v; else el.textContent = v;
+  });
+  document.querySelectorAll(".langs button").forEach(b=>b.classList.toggle("on", b.dataset.lang===lang));
+  document.title = lang==="ar" ? "مراجعتي — Ma Révision — My Revision"
+                 : lang==="fr" ? "Ma Révision — مراجعتي — My Revision"
+                 : "My Revision — مراجعتي — Ma Révision";
+  try{ localStorage.setItem("mr-lang", lang); }catch(e){}
+}
+document.querySelectorAll(".langs button").forEach(b=>b.addEventListener("click",()=>apply(b.dataset.lang)));
+let start = "en";
+try{ start = localStorage.getItem("mr-lang") || "en"; }catch(e){}
+if(!I18N[start]) start = "en";
+apply(start);
+</script>
+</body>
+</html>

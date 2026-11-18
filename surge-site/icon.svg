@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="مراجعتي">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f8bff"/>
+      <stop offset=".5" stop-color="#1b6af5"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fcd34d"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="pageL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dbe7ff"/>
+    </linearGradient>
+    <radialGradient id="gloss" cx=".3" cy=".18" r=".9">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".35"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity=".06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- bubbly rounded background -->
+  <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="120" fill="url(#gloss)"/>
+
+  <!-- floating bubbles -->
+  <circle cx="86" cy="132" r="20" fill="#fff" opacity=".3"/>
+  <circle cx="130" cy="452" r="13" fill="#fff" opacity=".35"/>
+  <circle cx="430" cy="418" r="24" fill="#fff" opacity=".22"/>
+  <circle cx="418" cy="120" r="11" fill="#fcd34d" opacity=".95"/>
+
+  <!-- open book -->
+  <path d="M104 330c42-28 100-32 148-12v96c-48-20-106-16-148 12z" fill="url(#pageL)"/>
+  <path d="M408 330c-42-28-100-32-148-12v96c48-20 106-16 148 12z" fill="url(#pageL)" opacity=".85"/>
+  <path d="M256 318v108" stroke="#1e40af" stroke-width="12" stroke-linecap="round" opacity=".9"/>
+  <g stroke="#93b4f7" stroke-width="10" stroke-linecap="round" fill="none">
+    <path d="M136 356c30-16 66-18 96-8"/>
+    <path d="M136 392c30-16 66-18 96-8"/>
+    <path d="M376 356c-30-16-66-18-96-8"/>
+    <path d="M376 392c-30-16-66-18-96-8"/>
+  </g>
+
+  <!-- progress bubble: ring + check -->
+  <circle cx="256" cy="188" r="92" fill="#0b3fa8" opacity=".28"/>
+  <circle cx="256" cy="188" r="78" fill="none" stroke="#ffffff" stroke-opacity=".38" stroke-width="22"/>
+  <circle cx="256" cy="188" r="78" fill="none" stroke="url(#ring)" stroke-width="22"
+          stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="147"
+          transform="rotate(-90 256 188)"/>
+  <path d="M224 190l22 22 42-46" fill="none" stroke="#fff" stroke-width="20"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
