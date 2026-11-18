@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───────────────────────── Design tokens ───────────────────────── */
+:root,
+[data-theme='dark'] {
+  --background: 222 47% 6%;
+  --foreground: 210 40% 96%;
+  --card: 221 39% 10%;
+  --card-foreground: 210 40% 96%;
+  --surface: 221 39% 9%;
+  --surface-muted: 220 33% 12%;
+  --surface-elevated: 220 30% 14%;
+  --muted: 220 20% 16%;
+  --muted-foreground: 215 16% 62%;
+  --border: 217 25% 18%;
+  --primary: 217 91% 53%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 24 94% 50%;
+  --success: 160 84% 39%;
+  --warning: 38 92% 50%;
+  --danger: 0 84% 60%;
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --surface: 210 40% 98%;
+  --surface-muted: 214 32% 95%;
+  --surface-elevated: 0 0% 100%;
+  --muted: 214 32% 92%;
+  --muted-foreground: 215 16% 42%;
+  --border: 214 32% 88%;
+  --primary: 217 91% 53%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 24 94% 50%;
+  --success: 160 84% 35%;
+  --warning: 38 92% 45%;
+  --danger: 0 84% 55%;
+  color-scheme: light;
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans), system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  html[lang='ar'] body {
+    font-family: var(--font-arabic), 'Noto Sans Arabic', system-ui, sans-serif;
+  }
+  /* Arabic typography: slightly looser leading for readability */
+  html[lang='ar'] {
+    line-height: 1.75;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.3);
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+  /* Number inputs: hide spinners */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))] shadow-sm;
+  }
+  .input {
+    @apply w-full rounded-xl border bg-[hsl(var(--surface))] px-3.5 py-2.5 text-sm text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] transition outline-none focus:border-[hsl(var(--primary))] focus:ring-2 focus:ring-[hsl(var(--primary)/0.25)] disabled:opacity-60;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-[hsl(var(--muted-foreground))];
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition active:scale-[.98] disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:opacity-90;
+  }
+  .btn-outline {
+    @apply btn border bg-transparent hover:bg-[hsl(var(--muted))];
+  }
+  .btn-ghost {
+    @apply btn bg-transparent hover:bg-[hsl(var(--muted))];
+  }
+  .btn-danger {
+    @apply btn bg-[hsl(var(--danger))] text-white hover:opacity-90;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold;
+  }
+  .skeleton {
+    @apply animate-shimmer rounded-lg bg-[linear-gradient(90deg,hsl(var(--muted))25%,hsl(var(--surface-elevated))50%,hsl(var(--muted))75%)] bg-[length:200%_100%];
+  }
+}
+
+@layer utilities {
+  .container-app {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Print / PDF export */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  @page {
+    margin: 14mm;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

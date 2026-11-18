@@ -1,0 +1,571 @@
+// مراجعتي — Ma Révision — My Revision
+// Database schema.
+//
+// Provider notes:
+//   * Local development uses SQLite (zero-config, real file, real migrations).
+//   * Production targets PostgreSQL / Supabase. To switch: change `provider` below
+//     to "postgresql" and run `npx prisma migrate deploy`.
+//   * All multi-tenant models carry `userId` and every query layer filters by the
+//     authenticated session user — never by a client-provided id.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── Identity ───────────────────────────
+
+enum Role {
+  STUDENT
+  ADMIN
+  // Platform owner — provisioned only by the seed process, never through
+  // any admin or client action. Full platform control via /owner.
+  OWNER
+}
+
+enum AccountStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         Role          @default(STUDENT)
+  status       AccountStatus @default(PENDING)
+  locale       String        @default("ar")
+  theme        String        @default("dark")
+  emailVerifiedAt DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  profile           UserProfile?
+  sessions          Session[]
+  academicYears     AcademicYear[]
+  semesters         Semester[]
+  specializations   Specialization[]
+  subjects          Subject[]
+  chapters          Chapter[]
+  lessons           Lesson[]
+  availability      StudyAvailability[]
+  sessionsStudy     StudySession[]
+  reschedules       ReschedulingHistory[]
+  exams             Exam[]
+  notes             Note[]
+  resources         Resource[]
+  notifications     Notification[]
+  timerRecords      StudyTimerRecord[]
+  activityLogs      ActivityLog[]
+  adminAuditLogs    AdminAuditLog[]     @relation("AdminAuditLogs")
+  targetsAuditLogs  AdminAuditLog[]     @relation("TargetAuditLogs")
+  prefs             StudyPreference?
+  refreshTokens     AuthToken[]
+  emailLogs         EmailLog[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model UserProfile {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio       String?
+  school    String? // university / educational institution
+  program   String? // field of study
+  timezone  String  @default("Africa/Nouakchott")
+  phone     String?
+  avatarUrl String?
+  // Academic profile (all optional)
+  country           String?
+  city              String?
+  academicLevel     String?
+  academicYear      String?
+  preferredLanguage String? // ar | fr | en
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Email verification + password reset tokens (hashed at rest).
+model AuthToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // VERIFY_EMAIL | RESET_PASSWORD
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, type])
+  @@index([expiresAt])
+}
+
+// Every transactional email attempt (verification, resend, recovery,
+// security notice). FAILED rows are recorded for audit but never count
+// against the daily quota — only EmailQuota does the counting.
+model EmailLog {
+  id        String    @id @default(cuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email     String // lowercased recipient address
+  kind      String // VERIFY | RESEND | RESET | SECURITY
+  status    String // SENT | FAILED | SKIPPED (no account — kept for uniform anti-enumeration quotas)
+  error     String?
+  createdAt DateTime  @default(now())
+
+  @@index([email, kind, status, createdAt])
+  @@index([createdAt])
+}
+
+// Rolling 24h send quota, one row per address. Reserved with a conditional
+// UPDATE (compare-and-set) so concurrent requests can never exceed the
+// limit, and released again when a send fails.
+model EmailQuota {
+  email       String   @id
+  windowStart DateTime
+  used        Int      @default(0)
+  updatedAt   DateTime @updatedAt
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  userAgent String?
+  ip        String?
+  expiresAt DateTime
+  lastSeenAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ─────────────────────── Academic structure ───────────────────────
+
+enum YearStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model AcademicYear {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  status      YearStatus @default(ACTIVE)
+  description String?
+  isCurrent   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  semesters       Semester[]
+  specializations Specialization[]
+
+  @@index([userId, status])
+  @@unique([userId, name])
+}
+
+model Semester {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  name           String
+  startDate      DateTime
+  endDate        DateTime
+  order          Int      @default(0)
+  isCurrent      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  subjects   Subject[]
+  notes      Note[]
+
+  @@index([userId, academicYearId])
+  @@unique([userId, academicYearId, name])
+}
+
+model Specialization {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  program        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  subjects Subject[]
+
+  @@index([userId, academicYearId])
+  @@unique([userId, academicYearId, name])
+}
+
+enum Importance {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Subject {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  semesterId     String?
+  semester       Semester? @relation(fields: [semesterId], references: [id], onDelete: SetNull)
+  specializationId String?
+  specialization Specialization? @relation(fields: [specializationId], references: [id], onDelete: SetNull)
+
+  name        String
+  description String?
+  icon        String    @default("book")
+  color       String    @default("#1b6af5")
+  coefficient Float     @default(1)
+  importance  Importance @default(MEDIUM)
+  priority    Int       @default(3) // 1 = highest … 5 = lowest
+  examDate    DateTime?
+  deadline    DateTime?
+  estimatedHours Float  @default(0)
+  notes       String?
+  order       Int       @default(0)
+  archivedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  chapters  Chapter[]
+  lessons   Lesson[]
+  sessions  StudySession[]
+  exams     Exam[]
+  noteRows  Note[]
+  resources Resource[]
+  timerRecords StudyTimerRecord[]
+
+  @@index([userId, archivedAt])
+  @@index([userId, semesterId])
+  @@index([examDate])
+}
+
+model Chapter {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId   String
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  order       Int      @default(0)
+  archivedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons    Lesson[]
+  sessions   StudySession[]
+  noteRows   Note[]
+  resources  Resource[]
+
+  @@index([userId, subjectId])
+  @@index([subjectId, order])
+}
+
+enum LessonStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  NEEDS_REVISION
+}
+
+enum LessonPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Lesson {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapterId   String
+  chapter     Chapter      @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  subjectId   String
+  subject     Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  title            String
+  description      String?
+  order            Int            @default(0)
+  estimatedMinutes Int            @default(45)
+  priority         LessonPriority @default(MEDIUM)
+  status           LessonStatus   @default(NOT_STARTED)
+  completedAt      DateTime?
+  notes            String?
+  archivedAt       DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  sessions    StudySession[]
+  noteRows    Note[]
+  resources   Resource[]
+  timerRecords StudyTimerRecord[]
+
+  @@index([userId, status])
+  @@index([userId, subjectId])
+  @@index([chapterId, order])
+}
+
+// ─────────────────────── Planning & scheduling ───────────────────────
+
+// Weekly availability windows (0 = Sunday … 6 = Saturday).
+model StudyAvailability {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekday   Int
+  startTime String // "HH:MM"
+  endTime   String // "HH:MM"
+  createdAt DateTime @default(now())
+
+  @@unique([userId, weekday, startTime, endTime])
+  @@index([userId, weekday])
+}
+
+model StudyPreference {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  maxDailyMinutes      Int      @default(180)
+  preferredSessionMin  Int      @default(45)
+  breakMinutes         Int      @default(10)
+  pomodoroStudyMin     Int      @default(25)
+  pomodoroBreakMin     Int      @default(5)
+  pomodoroLongBreakMin Int      @default(15)
+  pomodoroCycles       Int      @default(4)
+  remindBeforeMin      Int      @default(15)
+  notificationsEnabled Boolean  @default(true)
+  emailEnabled         Boolean  @default(false)
+  updatedAt            DateTime @updatedAt
+}
+
+enum SessionStatus {
+  SCHEDULED
+  COMPLETED
+  MISSED
+  POSTPONED
+  CANCELLED
+}
+
+enum SessionSource {
+  MANUAL
+  AUTO
+}
+
+model StudySession {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId   String
+  subject     Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  chapterId   String?
+  chapter     Chapter?      @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  lessonId    String?
+  lesson      Lesson?       @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+
+  date            DateTime // session day (start of day)
+  startTime       String // "HH:MM"
+  endTime         String // "HH:MM"
+  durationMinutes Int
+  priority        LessonPriority @default(MEDIUM)
+  status          SessionStatus  @default(SCHEDULED)
+  source          SessionSource  @default(MANUAL)
+  notes           String?
+  completedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  reschedulesFrom ReschedulingHistory[] @relation("OriginalSession")
+  reschedulesTo   ReschedulingHistory[] @relation("NewSession")
+
+  @@index([userId, date])
+  @@index([userId, status])
+  @@index([userId, subjectId, date])
+  @@index([lessonId])
+}
+
+// Never delete history: every reschedule keeps the original session and the new one.
+model ReschedulingHistory {
+  id                String       @id @default(cuid())
+  userId            String
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  originalSessionId String
+  originalSession   StudySession @relation("OriginalSession", fields: [originalSessionId], references: [id], onDelete: Cascade)
+  newSessionId      String?
+  newSession        StudySession? @relation("NewSession", fields: [newSessionId], references: [id], onDelete: SetNull)
+
+  originalDate   DateTime
+  newDate        DateTime?
+  originalStatus SessionStatus
+  newStatus      SessionStatus?
+  reason         String?
+  rescheduledAt  DateTime     @default(now())
+
+  @@index([userId, rescheduledAt])
+  @@index([originalSessionId])
+}
+
+model Exam {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId  String
+  subject    Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title      String
+  date       DateTime
+  importance Importance @default(HIGH)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId, date])
+  @@index([subjectId])
+}
+
+// ─────────────────────── Content & resources ───────────────────────
+
+enum NoteKind {
+  TEXT
+  LINK
+}
+
+model Note {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind       NoteKind  @default(TEXT)
+  title      String
+  content    String    @default("")
+  semesterId String?
+  semester   Semester? @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  subjectId  String?
+  subject    Subject?  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  chapterId  String?
+  chapter    Chapter?  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  lessonId   String?
+  lesson     Lesson?   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId, subjectId])
+  @@index([userId, archivedAt])
+}
+
+model Resource {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  kind       String // FILE | LINK
+  url        String   @default("") // external link, or relative private path
+  mimeType   String?
+  sizeBytes  Int      @default(0)
+  subjectId  String?
+  subject    Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  chapterId  String?
+  chapter    Chapter? @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  lessonId   String?
+  lesson     Lesson?  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([userId, subjectId])
+}
+
+// ─────────────────────── Activity & notifications ───────────────────────
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // SESSION_REMINDER | SESSION_MISSED | EXAM_UPCOMING | PROGRESS_SUMMARY | GOAL_ACHIEVED | LESSON_OVERDUE | RESCHEDULE_SUGGESTION
+  titleKey  String
+  bodyKey   String
+  params    String    @default("{}") // JSON of interpolation values — never free user HTML
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+model StudyTimerRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId   String?
+  subject     Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  lessonId    String?
+  lesson      Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  mode        String   @default("FOCUS") // FOCUS | POMODORO | BREAK
+  startedAt   DateTime
+  endedAt     DateTime?
+  durationSec Int      @default(0)
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([userId, startedAt])
+  @@index([subjectId])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entityType String // LESSON | SESSION | SUBJECT | EXAM | NOTE | ...
+  entityId   String?
+  action     String // CREATE | UPDATE | DELETE | COMPLETE | REOPEN | RESCHEDULE ...
+  meta       String   @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, entityType])
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id], onDelete: Cascade)
+  targetId   String?
+  target     User?    @relation("TargetAuditLogs", fields: [targetId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String   @default("User")
+  meta       String   @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([action])
+}
+
+// Server-enforced platform configuration, editable only from /owner
+// (requireOwner). Every change is written to AdminAuditLog.
+model PlatformSetting {
+  key       String   @id // REGISTRATION_OPEN | EMAIL_DAILY_SEND_LIMIT
+  value     String
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+}

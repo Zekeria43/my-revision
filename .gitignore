@@ -1,0 +1,35 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# secrets
+.env
+.env.local
+.env.*.local
+
+# database
+prisma/dev.db
+prisma/dev.db-journal
+*.db
+*.db-journal
+
+# uploads (user private files — never commit)
+uploads/
+!uploads/.gitkeep
+
+# logs & reports
+*.log
+npm-debug.log*
+coverage/
+playwright-report/
+test-results/
+
+# editors / os
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.tsbuildinfo
+next-env.d.ts
