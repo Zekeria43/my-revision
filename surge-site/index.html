@@ -241,13 +241,14 @@
       <h1><span data-i="h1a">Master your studies with</span> <span class="grad-txt" data-i="h1b">one organized platform</span></h1>
       <p class="sub" data-i="sub">Academic structure, timetable, smart planner, quizzes, notes, notifications and analytics — with real accounts, verified emails and a full admin & owner console.</p>
       <div class="cta">
-        <a class="btn btn-grad" href="http://localhost:3001/en/register" data-i="cta1">Create free account</a>
+        <a class="btn btn-grad" href="http://localhost:3001/en/student-login" data-i="cta1">Student sign-in</a>
+        <a class="btn btn-gold" href="http://localhost:3001/en/admin-login" data-i="ctaAdmin">Staff / Admin sign-in</a>
         <a class="btn btn-glass" href="#access" data-i="cta2">Local access & logins</a>
       </div>
       <div class="stats">
         <div class="stat"><b>3</b><span data-i="s1">Languages</span></div>
-        <div class="stat"><b>739×3</b><span data-i="s2">Translated keys</span></div>
-        <div class="stat"><b>161</b><span data-i="s3">Automated tests</span></div>
+        <div class="stat"><b>750×3</b><span data-i="s2">Translated keys</span></div>
+        <div class="stat"><b>171</b><span data-i="s3">Automated tests</span></div>
         <div class="stat"><b>5</b><span data-i="s4">Roles & consoles</span></div>
       </div>
     </div>
@@ -300,6 +301,8 @@
         <a class="link" href="http://localhost:3001/fr"><span>Français (LTR)<em>Page d'accueil</em></span>↗</a>
         <a class="link" href="http://localhost:3001/en"><span>English (LTR)<em>Landing page</em></span>↗</a>
         <a class="link" href="http://localhost:3001/en/login"><span>Log in<em>/login · /register</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/en/student-login"><span>🎓 Student sign-in<em>/student-login</em></span>↗</a>
+        <a class="link" href="http://localhost:3001/en/admin-login"><span>🛡️ Staff / Admin sign-in<em>/admin-login</em></span>↗</a>
         <a class="link" href="http://localhost:3001/en/owner"><span>👑 Owner console<em>/owner</em></span>↗</a>
         <a class="link" href="http://localhost:3001/en/admin"><span>🛡️ Admin panel<em>/admin</em></span>↗</a>
         <a class="link" href="http://localhost:3001/en/dashboard"><span>🎓 Student dashboard<em>/dashboard</em></span>↗</a>
@@ -333,7 +336,7 @@ npm run build &amp;&amp; npm start   <span class="c"># production → :3001</spa
 <footer>
   <div class="wrap foot">
     <span><span class="dot"></span><span data-i="foot">© 2026 My Revision — مراجعتي — Ma Révision. All rights reserved.</span></span>
-    <span data-i="foot2">Built with Next.js · Prisma · next-intl · 161 tests passing</span>
+    <span data-i="foot2">Built with Next.js · Prisma · next-intl · 171 tests passing</span>
   </div>
 </footer>
 
@@ -360,7 +363,7 @@ const I18N = {
     pill:"3 languages · RTL & LTR · PWA ready",
     h1a:"Master your studies with", h1b:"one organized platform",
     sub:"Academic structure, timetable, smart planner, quizzes, notes, notifications and analytics — with real accounts, verified emails and a full admin & owner console.",
-    cta1:"Create free account", cta2:"Local access & logins",
+    cta1:"Student sign-in", ctaAdmin:"Staff / Admin sign-in", cta2:"Local access & logins",
     s1:"Languages", s2:"Translated keys", s3:"Automated tests", s4:"Roles & consoles",
     showH:"مراجعتي — Ma Révision — My Revision",
     showP:"Bubbly identity: gradient tile, floating bubbles, open book and a gold progress ring.",
@@ -379,14 +382,14 @@ const I18N = {
     aRunH:"Run the full app",
     aDeploy:"<b>Public hosting:</b> the full app is a Next.js server (auth + database) — deploy it to <b>Vercel</b> or any Node host. This Surge page is a static landing only.",
     foot:"© 2026 My Revision — مراجعتي — Ma Révision. All rights reserved.",
-    foot2:"Built with Next.js · Prisma · next-intl · 161 tests passing" },
+    foot2:"Built with Next.js · Prisma · next-intl · 171 tests passing" },
 
   fr:{ dir:"ltr",
     brand:"Ma Révision", brandSub:"My Revision — مراجعتي", login:"Connexion",
     pill:"3 langues · RTL & LTR · PWA prête",
     h1a:"Maîtrisez vos études avec", h1b:"une plateforme bien organisée",
     sub:"Structure académique, emploi du temps, planificateur intelligent, quiz, notes, notifications et analyses — avec de vrais comptes, e-mails vérifiés et une console admin + propriétaire.",
-    cta1:"Créer un compte gratuit", cta2:"Accès local & identifiants",
+    cta1:"Connexion étudiante", ctaAdmin:"Connexion admin / personnel", cta2:"Accès local & identifiants",
     s1:"Langues", s2:"Clés traduites", s3:"Tests automatisés", s4:"Rôles & consoles",
     showH:"مراجعتي — Ma Révision — My Revision",
     showP:"Identité « bubbly » : tuile dégradée, bulles flottantes, livre ouvert et anneau de progression doré.",
@@ -405,14 +408,14 @@ const I18N = {
     aRunH:"Lancer l'application complète",
     aDeploy:"<b>Hébergement public :</b> l'application complète est un serveur Next.js (auth + base) — déployez-la sur <b>Vercel</b> ou tout hôte Node. Cette page Surge est une landing statique.",
     foot:"© 2026 Ma Révision — مراجعتي — My Revision. Tous droits réservés.",
-    foot2:"Construit avec Next.js · Prisma · next-intl · 161 tests validés" },
+    foot2:"Construit avec Next.js · Prisma · next-intl · 171 tests validés" },
 
   ar:{ dir:"rtl",
     brand:"مراجعتي", brandSub:"My Revision — Ma Révision", login:"تسجيل الدخول",
     pill:"٣ لغات · RTL و LTR · جاهز كتطبيق PWA",
     h1a:"أتقن دراستك مع", h1b:"منصة واحدة منظّمة",
     sub:"البنية الأكاديمية، الجدول الزمني، المخطط الذكي، الاختبارات، الملاحظات، الإشعارات والتحليلات — بحسابات حقيقية، بريد مُفعّل، ولوحة إدارة ومالك كاملة.",
-    cta1:"أنشئ حساباً مجانياً", cta2:"الوصول المحلي وبيانات الدخول",
+    cta1:"دخول الطالب", ctaAdmin:"دخول المدير / الطاقم", cta2:"الوصول المحلي وبيانات الدخول",
     s1:"لغات", s2:"مفتاح مترجَم", s3:"اختبار آلي", s4:"أدوار وَلوحات",
     showH:"مراجعتي — Ma Révision — My Revision",
     showP:"هوية فقاعية: تدرّج أزرق→بنفسجي، فقاعات عائمة، كتاب مفتوح وحلقة تقدّم ذهبية.",
@@ -431,7 +434,7 @@ const I18N = {
     aRunH:"تشغيل التطبيق الكامل",
     aDeploy:"<b>النشر العام:</b> التطبيق الكامل خادم Next.js (مصادقة + قاعدة بيانات) — انشره على <b>Vercel</b> أو أي مضيف Node. صفحة Surge هذه ثابتة فقط.",
     foot:"© 2026 مراجعتي — Ma Révision — My Revision. جميع الحقوق محفوظة.",
-    foot2:"بُني بـ Next.js · Prisma · next-intl · 161 اختباراً ناجحاً" },
+    foot2:"بُني بـ Next.js · Prisma · next-intl · 171 اختباراً ناجحاً" },
 };
 
 function apply(lang){

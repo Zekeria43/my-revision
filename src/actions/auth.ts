@@ -225,6 +225,9 @@ export async function resendVerificationAction(_prev: ActionState, formData: For
 
 export async function loginAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const locale = String(formData.get('locale') ?? routing.defaultLocale)
+  // Which portal submitted the form: 'admin' (staff), 'student', or '' for the
+  // general /login page. Validated server-side below — never trusted as-is.
+  const portal = String(formData.get('portal') ?? '')
   const parsed = loginSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
@@ -265,6 +268,13 @@ export async function loginAction(_prev: ActionState, formData: FormData): Promi
     }
     return fail('auth.errPending')
   }
+
+  // Portal separation: a staff account cannot sign in through the student
+  // portal and a student cannot sign in through the staff portal. Checked
+  // AFTER password verification so it cannot be used for account enumeration,
+  // and BEFORE any session exists so no session is ever created on mismatch.
+  if (portal === 'admin' && user.role === 'STUDENT') return fail('auth.errWrongPortal')
+  if (portal === 'student' && user.role !== 'STUDENT') return fail('auth.errWrongPortal')
 
   resetRateLimit(key)
   await createSession(user.id, { userAgent: formData.get('userAgent')?.toString() ?? undefined, ip: clientIp() })
